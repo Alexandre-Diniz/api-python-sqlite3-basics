@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import database
+from database import DataBase
 
 app = Flask(__name__)
 app.config["DEBUG"] = False
@@ -11,12 +11,13 @@ def home():
 @app.route('/api/v1/', methods=['POST'])
 def names():
     try:
+        db = DataBase()
         if 'id' in request.args and 'name' in request.args and 'begin_date' in request.args and 'end_date' in request.args:
             data = {}
             for key in request.args:
                 data[key]=request.args[key]
-            database.insert_in_table((int(data['id']),data['name'],data['begin_date'],data['end_date']))
-            return '<h1>Done</h1>'
+            db.insert_one((int(data['id']),data['name'],data['begin_date'],data['end_date']))
+            return '<h1>Done in insert one</h1>'
         else:
             return jsonify([])
     except:
@@ -25,18 +26,19 @@ def names():
 @app.route('/api/v1/', methods=['GET'])
 def names_get():
     try:
+        db = DataBase()
         if 'id' in request.args:
-            return jsonify(database.search_in_table_by_id(int(request.args['id'])))
+            return jsonify(db.find_by_id(int(request.args['id'])))
         else:
             return '<h1>ID não fornecido</h1>'
     except:
-        return '<h1>Erro</h1>'
+        return '<h1>Erro in find by id</h1>'
 
 @app.route('/api/v1/all', methods=['GET'])
 def names_get_all():
     try:
-        
-        return jsonify(database.search_in_table_all())
+        db = DataBase()
+        return jsonify(db.search_in_table_all())
     except:
         return '<h1>Erro get all</h1>'
 
